@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Document;
 use Illuminate\Http\Request;
 
 use App\Category;
 use App\User;
 use Auth;
 use Gate;
+use DB;
 
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
+
+
     /**
      * Display a listing of the resource.
      *
@@ -24,6 +28,7 @@ class CategoryController extends Controller
         return view('home')->with('categories', $categories);
     }
 
+
     /**
      * Show the form for creating a new resource.
      *
@@ -31,7 +36,12 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return view('admin.categories.create');
+        if(Gate::allows('delete-users')){
+            return view('admin.categories.create');
+        }
+        if(Gate::denies('delete-users')){
+            return back()->with('error','Nemate dozvolu pristupiti navedenoj stranici');
+        }
     }
 
     /**
@@ -78,17 +88,17 @@ class CategoryController extends Controller
         $category->cover_image = $filenameToStore;
         // $album->cover_image = $filename;;
 
+        // $allowedfileExtension=['jpeg','png','jpg','bmp'];
 
-        // $album->save();
+        //$check=in_array($extension,$allowedfileExtension);
 
+            if($category->save()){
+                echo "Upload Successfully";
 
-        if($category->save()){
-            $request->session()->flash('success', "Kategorija " . $category->name . ' je uspještno kreirana');
-            return redirect('home');
-        }
-        if($category->save() == 0){
-           $request->session()->flash('error', 'Došlo je do pogreške tokom kreiranja kategorije!');
-        }
+                $request->session()->flash('success', "Kategorija " . $category->name . ' je uspještno kreirana');
+                return redirect('home');
+            }
+
 
 
     }
@@ -99,9 +109,28 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request)
     {
-        //
+        $category = Category::with('Documents')->findOrFail($request->id);
+
+
+        $files = Document::latest()->where([
+
+            ['doc_name', '!=', Null],
+            [function ($query) use ($request){
+                if (($term = $request->term)) {
+                    $query->orWhere('doc_name', 'LIKE', '%' . $term . '%')->get();
+                }
+            }]
+        ])->orderBy("doc_name", "asc")->paginate(5);
+
+
+
+      //  $files = DB::table('documents')->paginate(4);
+
+       // $files  =   Document::all()->paginate(2);;
+
+        return view('documents.index', compact('files'))->with('category', $category)->with('i', (request()->input('page', 1)-1)*5);
     }
 
     /**

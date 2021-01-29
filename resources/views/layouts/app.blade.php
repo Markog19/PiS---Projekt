@@ -17,11 +17,13 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
 
-
     <script src='https://kit.fontawesome.com/a076d05399.js'></script>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+
+
+
 </head>
 <body>
 
@@ -48,14 +50,21 @@
                             <li class="nav-item">
 
                                 <a class="nav-link" style="color: white" href="{{ route('login') }}">
-                                    <i class="fab fa-log-in"></i> {{ __('Login') }}</a>
+                                    <i class="fab fa-log-in"></i> {{ __('Prijavi se') }}</a>
                             </li>
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link" style="color: white" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                    <a class="nav-link" style="color: white" href="{{ route('register') }}">{{ __('Registriraj se') }}</a>
                                 </li>
                             @endif
                         @else
+
+                            @can('for-users')
+
+                                <li>
+                                    <a class="nav-link" style="color: white" href="{{route('documents.create')}}"><i class="fas fa-file-alt"></i> Objavi dokument</a>
+                                </li>
+                            @endcan
 
                                 @can('delete-users')
 
@@ -64,6 +73,8 @@
                                 </li>
                                 @endcan
 
+
+
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" style="color: white" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     <i class="fas fa-user"></i> {{ Auth::user()->name }} <span class="caret"></span>
@@ -71,11 +82,18 @@
 
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
 
+                                    @can('for-users')
+                                        <a class="dropdown-item" href="{{ route('my_documents.show',Auth::user()) }}">
+                                            <i class="fas fa-id-card-alt"></i> Moji dokumenti
+                                        </a>
+                                    @endcan
+
                                     @can('manage-users')
                                     <a class="dropdown-item" href="{{ route('admin.users.index') }}">
                                         <i class="fas fa-users-cog"></i> Upravljajte korisnicima
                                     </a>
                                     @endcan
+
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
@@ -117,8 +135,7 @@
 
                         <p align="justify">
                             Studentski materijali, je web stranica izrađena u svrhu kolegija "Projektiranje
-                            informacijskih sustava. Ideja web aplikacije jeste da se omogući korisnicima objava
-                            materijala
+                            informacijskih sustava". Ideja web aplikacije jeste da se omogući korisnicima objava, pretraga, te preuzimanje materijala po kategorijama u svrhu učenja.
                         </p>
                     </div>
                     <!--Grid column-->
@@ -142,7 +159,7 @@
 
                         <ul class="list-unstyled" align="justify">
                             <li>
-                                <a href="#!" class="text-white">Marko Galić&emsp;&emsp;537/RM&emsp;makro.galic@student.fsre.ba</a>
+                                <a href="#!" class="text-white">Marko Galić&emsp;&emsp;537/RM&emsp;marko.galic@student.fsre.ba</a>
                             </li>
                             <li>
                                 <a href="#!" class="text-white">Branimir Bulić&emsp;548/RM&emsp;branimir.bulic@student.fsre.ba</a>
@@ -165,7 +182,6 @@
         </footer>
 
     </div>
-
 
 </body>
 </html>

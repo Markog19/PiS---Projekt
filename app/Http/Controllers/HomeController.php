@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Document;
 use Illuminate\Http\Request;
+use DB;
 
 class HomeController extends Controller
 {
@@ -49,4 +50,7 @@ class HomeController extends Controller
 
 
     }
+
+
+
 }

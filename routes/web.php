@@ -27,6 +27,11 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware('can:mana
 });
 
 Route::resource('categories', 'CategoryController');
+
 Route::get('/category/{id}', 'CategoryController@show');
 
 Route::resource('home', 'HomeController');
+
+Route::resource('documents', 'DocumentController');
+
+Route::resource('my_documents', 'MyDocumentsController');

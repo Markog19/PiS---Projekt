@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
+use App\Document;
 use Illuminate\Http\Request;
+use DB;
+use Auth;
+use Gate;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -23,7 +29,12 @@ class DocumentController extends Controller
      */
     public function create()
     {
-        //
+
+       $categories = Category::all();
+
+       return view('documents.create')->with('categories', $categories);
+
+
     }
 
     /**
@@ -34,7 +45,43 @@ class DocumentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'doc_name' => 'required',
+            'user_name' => 'required',
+            'doc_file' => 'required|mimes:doc,docx,pdf,txt,xlsx,csv,pptx,ppt|max:5048',
+        ]);
+
+        $filenameWithExt = $request->file('doc_file')->getClientOriginalName();
+        $doc = $request->file('doc_file'); //sada
+        $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+        $extension = $request->file('doc_file')->getClientOriginalExtension();
+        $filenameToStore = $filename . '_' . time() . '.' . $extension;
+
+        Storage::disk('public')->putFileAs(
+            'uploads/documents/',
+            $doc,
+            $filenameToStore
+        );
+
+        $document = new Document();
+        $document->user_id =  Auth::user()->id;
+
+        $document->category_id = $request->input('category_id');
+
+        $document->doc_file = $filenameToStore;
+        $document->doc_name = $request->input('doc_name');
+        $document->user_name = $request->input('user_name');
+
+        $category_update = Category::find($request->input('category_id'));
+        $category_update->touch();
+
+        if($document->save()){
+            echo "Upload Successfully";
+
+            $request->session()->flash('success', "Dokument " . $document->name . ' je uspještno objavljen');
+            return redirect('home');
+        }
+
     }
 
     /**
@@ -77,8 +124,21 @@ class DocumentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Document $document)
     {
-        //
+        if($document->delete()){
+            $path = storage_path().'/app/public/uploads/documents/'.$document->doc_file;
+            unlink($path);
+            session()->flash('success', "Dokument " . $document->doc_name . ' je uspješno izbrisan');
+
+        }else{
+            session()->flash('error', 'Došlo je do greške prilikom brisanja dokumenta - ' . $document->doc_name . '!');
+        }
+
+        if(Gate::denies('delete-users')){
+            return redirect()->route('home');
+        }
+
+       return redirect()->route('home');
     }
 }

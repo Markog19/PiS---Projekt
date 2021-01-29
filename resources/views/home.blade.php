@@ -3,6 +3,9 @@
       crossorigin="anonymous">
 
 <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+
+
 @extends('layouts.app')
 
 
@@ -39,7 +42,7 @@
                             <div class="card mb-3">
                                 <div class="row no-gutters">
                                     <div class="col-md-3">
-                                        <img src="{{url('storage/uploads/categories_photos/'.$category->cover_image)}}" style="width:100%; height:100%;" class="card-img" alt="..." >
+                                        <img src="{{url('storage/uploads/categories_photos/'.$category->cover_image)}}" style="max-width: 100%;" class="card-img" alt="..." >
                                     </div>
                                     <div class="col-md-8">
 
@@ -55,7 +58,7 @@
 
 
                                             <p class="card-text">Broj dukumenata: {{ $count  }}</p>
-                                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                            <p class="card-text"><small class="text-muted">Zadnji put ažurirano: {{$category->updated_at->diffForHumans()}}</small></p>
 
                                         </div>
                                         @can('delete-users')
@@ -86,5 +89,6 @@
             </div>
         </div>
     </div>
+
 
 @endsection
