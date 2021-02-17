@@ -17,11 +17,12 @@ class CreateDocumentsTable extends Migration
             $table->increments('id');
             $table->bigInteger('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('category_id')->unsigned();
-            $table->foreign('category_id')->references('id')->on('category')->onDelete('cascade');;
+            $table->integer('category_id')->unsigned()->index();
+            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->string('doc_file');
             $table->string('doc_name');
             $table->string('user_name');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 29, 2021 at 02:55 PM
+-- Generation Time: Feb 17, 2021 at 01:46 PM
 -- Server version: 10.4.17-MariaDB
 -- PHP Version: 8.0.0
 
@@ -39,6 +39,20 @@ CREATE TABLE `categories` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `category_suggestions`
+--
+
+CREATE TABLE `category_suggestions` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `sug_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sug_cover_image` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `documents`
 --
 
@@ -49,6 +63,7 @@ CREATE TABLE `documents` (
   `doc_file` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `doc_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -91,8 +106,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (4, '2020_03_21_200529_create_roles_table', 1),
 (5, '2020_03_21_200756_create_role_user_table', 1),
 (6, '2020_03_22_163316_create_foreign_keys_for_role_user_table', 1),
-(7, '2020_12_28_174717_create_category_table', 1),
-(8, '2020_12_28_182224_create_documents_table', 1);
+(7, '2020_12_28_174717_create_categories_table', 1),
+(8, '2020_12_28_182224_create_documents_table', 1),
+(9, '2021_02_06_013521_create_category_suggestions_table', 2);
 
 -- --------------------------------------------------------
 
@@ -171,7 +187,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'admin@admin.com', NULL, '$2y$10$Ec0yTF2ASIUUej6gn7KrkuqKY5MBkncYxJ1i4QEKsnKpMIaakTb62', NULL, NULL, NULL);
+(1, 'Admin', 'admin@admin.com', NULL, '$2y$10$Ec0yTF2ASIUUej6gn7KrkuqKY5MBkncYxJ1i4QEKsnKpMIaakTb62', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -182,15 +198,21 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `re
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `category_user_id_index` (`user_id`);
+  ADD KEY `categories_user_id_index` (`user_id`);
+
+--
+-- Indexes for table `category_suggestions`
+--
+ALTER TABLE `category_suggestions`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `documents`
 --
 ALTER TABLE `documents`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `documents_category_id_foreign` (`category_id`),
-  ADD KEY `documents_user_id_index` (`user_id`);
+  ADD KEY `documents_user_id_index` (`user_id`),
+  ADD KEY `documents_category_id_index` (`category_id`);
 
 --
 -- Indexes for table `failed_jobs`
@@ -239,13 +261,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `category_suggestions`
+--
+ALTER TABLE `category_suggestions`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `documents`
 --
 ALTER TABLE `documents`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -257,25 +285,25 @@ ALTER TABLE `failed_jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `role_user`
 --
 ALTER TABLE `role_user`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -285,7 +313,7 @@ ALTER TABLE `users`
 -- Constraints for table `categories`
 --
 ALTER TABLE `categories`
-  ADD CONSTRAINT `category_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `categories_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `documents`

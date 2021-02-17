@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Category;
+use App\Document;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Role;
@@ -21,11 +23,26 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
 
-        $users = User::all();
-        return view('admin.users.index')->with('users', $users);
+        $users = User::latest()->where([
+            [function ($query) use ($request){
+                if (($term = $request->term)) {
+                    $query->orWhere('name', 'LIKE', '%' . $term . '%')->get();
+                }
+            }]
+        ])->orderBy("name", "asc")->paginate(5);
+
+       // $users = User::all();
+        $categories = Category::all();
+        $documents = Document::all();
+
+        $users_count = $users->count();
+        $categories_count = $categories->count();
+        $documents_count = $documents->count();
+
+        return view('admin.users.index', compact(['users', 'users_count', 'categories_count', 'documents_count']))->with('i', (request()->input('page', 1)-1)*5);
     }
 
 

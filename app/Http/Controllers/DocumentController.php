@@ -32,7 +32,12 @@ class DocumentController extends Controller
 
        $categories = Category::all();
 
-       return view('documents.create')->with('categories', $categories);
+        if(Gate::allows('for-users')){
+            return view('documents.create')->with('categories', $categories);
+        }
+        if(Gate::denies('for-users')){
+            return back()->with('error','Nemate dozvolu pristupiti navedenoj stranici');
+        }
 
 
     }
@@ -71,15 +76,16 @@ class DocumentController extends Controller
         $document->doc_file = $filenameToStore;
         $document->doc_name = $request->input('doc_name');
         $document->user_name = $request->input('user_name');
-
+        $document->description = $request->description;
         $category_update = Category::find($request->input('category_id'));
         $category_update->touch();
 
         if($document->save()){
             echo "Upload Successfully";
 
-            $request->session()->flash('success', "Dokument " . $document->name . ' je uspještno objavljen');
-            return redirect('home');
+            $request->session()->flash('success', "Dokument " . $document->doc_name . ' je uspještno objavljen u kategoriju ' . $category_update->name);
+            //return redirect('home');
+            return redirect()->route('category.show', $document->category_id);
         }
 
     }
@@ -137,6 +143,7 @@ class DocumentController extends Controller
 
         if(Gate::denies('delete-users')){
             return redirect()->route('home');
+
         }
 
        return redirect()->route('home');

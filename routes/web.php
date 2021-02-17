@@ -30,8 +30,14 @@ Route::resource('categories', 'CategoryController');
 
 Route::get('/category/{id}', 'CategoryController@show');
 
+Route::resource('category', 'CategoryController');
+
 Route::resource('home', 'HomeController');
 
 Route::resource('documents', 'DocumentController');
 
 Route::resource('my_documents', 'MyDocumentsController');
+
+Route::resource('sug_category', 'CategorySuggestionController');
+
+Route::resource('user_detail', 'UserDetailController');
